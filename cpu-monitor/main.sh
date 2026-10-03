@@ -51,7 +51,7 @@ function monitor() {
 		local _fk="${id},${__K}"
 		# shellcheck caught an error here, make _sure_ that we always
 		# have the double brackets/parens on all short-circuit checks
-		[[ -v diffstats["${_fk}"]] || diffstats["${_fk}"]=0
+		[[ -v diffstats["${_fk}"] ]] || diffstats["${_fk}"]=0
 		local -i temp=${diffstats["${_fk}"]}
 		temp+=${diffs["${__K}"]}
 		diffstats["${_fk}"]=$temp
