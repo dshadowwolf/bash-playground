@@ -6,9 +6,10 @@ source ./libs/databits.sh
 # called as `monitor [ period numsamples ]`
 function monitor() {
     local period=${1:-"0.25"}
-    local -i lines columns start_timestamp cur_timestamp prev_timestamp tdiff rr samples=${2:-4}
+    local -i lines columns rr samples=${2:-4}
     local -i lines columns
     local sleeper
+    # all of these are used, mostly as name-refs, shellcheck doesn't see this
     local -A start_sample cur_sample prev_sample diffs diffstats=()
     local -a prefixes
 
@@ -30,7 +31,7 @@ function monitor() {
     copy_array start_sample prev_sample
     
     # pause for the specified inter-sample period
-    timeout ${sleeper} ${period}
+    timeout "${sleeper}" "${period}"
 
     # next sample
     load_data cur_sample
@@ -48,7 +49,9 @@ function monitor() {
 	    calc_single "${id}" prev_sample cur_sample diffs
 	    for __K in "user" "system" "idle" "total"; do
 		local _fk="${id},${__K}"
-		[ -v diffstats["${_fk}"] ] || diffstats["${_fk}"]=0
+		# shellcheck caught an error here, make _sure_ that we always
+		# have the double brackets/parens on all short-circuit checks
+		[[ -v diffstats["${_fk}"]] || diffstats["${_fk}"]=0
 		local -i temp=${diffstats["${_fk}"]}
 		temp+=${diffs["${__K}"]}
 		diffstats["${_fk}"]=$temp
